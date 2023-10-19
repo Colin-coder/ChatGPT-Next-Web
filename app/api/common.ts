@@ -9,9 +9,12 @@ const DISABLE_GPT4 = !!process.env.DISABLE_GPT4;
 export async function requestOpenai(req: NextRequest) {
   const controller = new AbortController();
   const authValue = req.headers.get("Authorization") ?? "";
+  console.log("req.nextUrl.pathname:", req.nextUrl.pathname);
   const openaiPath = `${req.nextUrl.pathname}${req.nextUrl.search}`.replaceAll(
     "/api/openai/",
-    "",
+    // "",
+    // "/api/",
+    "api/",
   );
 
   let baseUrl = BASE_URL;
@@ -20,7 +23,7 @@ export async function requestOpenai(req: NextRequest) {
     baseUrl = `${PROTOCOL}://${baseUrl}`;
   }
 
-  if (baseUrl.endsWith('/')) {
+  if (baseUrl.endsWith("/")) {
     baseUrl = baseUrl.slice(0, -1);
   }
 
@@ -31,9 +34,12 @@ export async function requestOpenai(req: NextRequest) {
     console.log("[Org ID]", process.env.OPENAI_ORG_ID);
   }
 
-  const timeoutId = setTimeout(() => {
-    controller.abort();
-  }, 10 * 60 * 1000);
+  const timeoutId = setTimeout(
+    () => {
+      controller.abort();
+    },
+    10 * 60 * 1000,
+  );
 
   const fetchUrl = `${baseUrl}/${openaiPath}`;
   const fetchOptions: RequestInit = {
@@ -41,6 +47,7 @@ export async function requestOpenai(req: NextRequest) {
       "Content-Type": "application/json",
       "Cache-Control": "no-store",
       Authorization: authValue,
+      "HTTP-Referer": "https://newcon.space",
       ...(process.env.OPENAI_ORG_ID && {
         "OpenAI-Organization": process.env.OPENAI_ORG_ID,
       }),
@@ -78,6 +85,7 @@ export async function requestOpenai(req: NextRequest) {
     }
   }
 
+  console.log("[nktest fetch url] ", fetchUrl);
   try {
     const res = await fetch(fetchUrl, fetchOptions);
 

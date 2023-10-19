@@ -30,6 +30,7 @@ export class ChatGPTApi implements LLMApi {
   path(path: string): string {
     let openaiUrl = useAccessStore.getState().openaiUrl;
     const apiPath = "/api/openai";
+    // const apiPath = "/api";
 
     if (openaiUrl.length === 0) {
       const isApp = !!getClientConfig()?.isApp;
@@ -86,6 +87,8 @@ export class ChatGPTApi implements LLMApi {
         signal: controller.signal,
         headers: getHeaders(),
       };
+
+      console.log("nktest ", chatPath);
 
       // make a fetch request
       const requestTimeoutId = setTimeout(
